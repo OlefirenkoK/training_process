@@ -126,14 +126,13 @@ class SettingCollector(dict):
         super().__init__(settings)
 
 
-def get_project_settings():
-    pass
+def get_project_settings(**kwargs):
+    """Abstract function for initialization settings.
+        `kwargs`: given settings, the key must be same as one of `_id` of Setting classes.
+        return: union project settings. Components settings separate by `_id`.
+    """
+    return SettingCollector(**kwargs)
 
 
 if __name__ == '__main__':
-    # settings = RunSetting()  # {'rrr': 1, 'port': 8000}
-    # print(settings)
-    # db_settings = DBSettings()   # {'psql_host': '8.8.8.8'}
-    # print(db_settings)
-    settings = SettingCollector()
-    print(type(settings.run))
+    settings = get_project_settings(run={'rrr': 1, 'port': 8000}, db={'psql_host': '8.8.8.8'})
