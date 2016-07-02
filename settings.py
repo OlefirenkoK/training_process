@@ -51,7 +51,6 @@ class FabricSettings(dict):
         super().__init__(**self.settings)
 
 
-
 class DefaultRunSettings(FabricDefaultSettings):
 
     """Default project settings. All settings must be writen in
@@ -59,6 +58,7 @@ class DefaultRunSettings(FabricDefaultSettings):
 
     def _default_settings(self):
         settings = super()._default_settings()
+        settings['host'] = '127.0.0.1'
         settings['port'] = 8888
         settings['debug'] = True
         return settings
@@ -88,12 +88,24 @@ class DBSettings(FabricSettings):
 
     def get_db_url(self):
         return self.POSTGRES_PATTERN.format(
-            login=self.settings['psql_login'],
-            password=self.settings['psql_password'],
-            host=self.settings['psql_host'],
-            port=self.settings['psql_port'],
-            dbname=self.settings['psql_dbname']
+            login=self['psql_login'],
+            password=self['psql_password'],
+            host=self['psql_host'],
+            port=self['psql_port'],
+            dbname=self['psql_dbname']
         )
+
+    @property
+    def debug(self):
+        return get_debug_status()
+
+    @debug.setter
+    def debug(self):
+        raise PermissionError
+
+    @debug.deleter
+    def debug(self):
+        raise PermissionError
 
 
 class RunSetting(FabricSettings):
@@ -107,10 +119,16 @@ class RunSetting(FabricSettings):
 
 class SettingCollector(dict):
 
+    __init = None
     collector = [
         RunSetting,
         DBSettings,
     ]
+
+    def __new__(cls, *args, **kwargs):
+        if cls.__init is None:
+            cls.__init = super().__new__(cls, *args, **kwargs)
+        return cls.__init
 
     def __getattr__(self, item):
         if item in self:
@@ -125,14 +143,48 @@ class SettingCollector(dict):
             settings[_id] = config(item_settings)
         super().__init__(settings)
 
+    def get_settings(self, _id):
+        """Return setting by input name.
+            - `_id` - name of settings.
+        """
+        return self[_id]
 
-def get_project_settings(**kwargs):
-    """Abstract function for initialization settings.
-        `kwargs`: given settings, the key must be same as one of `_id` of Setting classes.
+    def get_settings_item(self, _id, item):
+        """Return config argument
+            - `_id` - name of settings.
+            - `item` - name of settings item.
+        """
+
+        settings = self.get_settings(_id)
+        return settings[item]
+
+
+def get_or_create_project_settings(**kwargs):
+    """Abstract function for initialization settings. If project settings was
+    created return it.
+        `kwargs`: given settings, the key must be same as one of `_id`
+                  of Setting classes.
         return: union project settings. Components settings separate by `_id`.
     """
     return SettingCollector(**kwargs)
 
 
+def get_project_settings_config(name):
+    """Return project settings config part by input name.
+        - `name` - config name.
+    """
+    settings_controller = get_or_create_project_settings()
+    return settings_controller.get_settings(name)
+
+
+def get_debug_status():
+    """Settings interface. Return debug status."""
+    settings = get_or_create_project_settings()
+    return settings.get_settings_item('run', 'debug')
+
+
 if __name__ == '__main__':
-    settings = get_project_settings(run={'rrr': 1, 'port': 8000}, db={'psql_host': '8.8.8.8'})
+    settings = get_or_create_project_settings(
+        run={'rrr': 1, 'port': 8000},
+        db={'psql_host': '8.8.8.8'}
+    )
