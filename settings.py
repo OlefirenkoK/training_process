@@ -61,6 +61,7 @@ class DefaultRunSettings(FabricDefaultSettings):
         settings['host'] = '127.0.0.1'
         settings['port'] = 8888
         settings['debug'] = True
+        settings['salt'] = 'qawvAsgn2GRtPww066ShB6cX79ZUAV7KTzXXvNIzkr0IlLnJ'
         return settings
 
 
@@ -71,8 +72,9 @@ class DefaultDBSettings(FabricDefaultSettings):
         settings['psql_login'] = 'flash'
         settings['psql_password'] = 'bkk.pbz'
         settings['psql_host'] = 'localhost'
-        settings['psql_port'] = 11111
+        settings['psql_port'] = 5432
         settings['psql_dbname'] = 'tp'
+        settings['salt'] = 'qawvAsgn2GRtPww066ShB6cX79ZUAV7KTzXXvNIzkr0IlLnJ'
         return settings
 
 
@@ -175,6 +177,15 @@ def get_project_settings_config(name):
     """
     settings_controller = get_or_create_project_settings()
     return settings_controller.get_settings(name)
+
+
+def get_project_settings_config_item(_id, name):
+    """Return part of project settings config.
+        - `_id` - config name.
+        - `name` - part of config name.
+    """
+    config = get_project_settings_config(_id)
+    return config[name]
 
 
 def get_debug_status():
