@@ -1,0 +1,46 @@
+{
+  "user": [
+    {
+      "name": "admin",
+      "email": "admin@example.com",
+      "password": "admin",
+      "is_admin": true,
+      "is_active": true
+    },
+    {
+      "name": "test1",
+      "email": "test1@example.com",
+      "password": "test1",
+      "is_admin": false,
+      "is_active": true
+    },
+    {
+      "name": "test2",
+      "email": "test2@example.com",
+      "password": "test2",
+      "is_admin": false,
+      "is_active": true
+    },
+    {
+      "name": "test3",
+      "email": "test3@example.com",
+      "password": "test3",
+      "is_admin": false,
+      "is_active": true
+    },
+    {
+      "name": "test4",
+      "email": "test4@example.com",
+      "password": "test4",
+      "is_admin": false,
+      "is_active": true
+    },
+    {
+      "name": "test5",
+      "email": "test5@example.com",
+      "password": "test5",
+      "is_admin": false,
+      "is_active": false
+    }
+  ]
+}
