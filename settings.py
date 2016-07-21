@@ -82,7 +82,8 @@ class DefaultDevSettings(FabricDefaultSettings):
 
     def _default_settings(self):
         return {
-            'xsrf_cookies': True,
+            'xsrf_cookies': False,
+            'cookie_secret': 'fdRbVsgQ2GRtPxx066ShF6cX79ZUAV7KT1XXvNIzkr0IlLnJ'
         }
 
 
