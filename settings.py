@@ -1,3 +1,6 @@
+import os
+
+
 class FabricDefaultSettings(dict):
 
     def __init__(self):
@@ -80,11 +83,21 @@ class DefaultDBSettings(FabricDefaultSettings):
 
 class DefaultDevSettings(FabricDefaultSettings):
 
+    def __init__(self):
+        self._static_path = os.path.join(os.getcwd(), '/static/')
+        super().__init__()
+
     def _default_settings(self):
         return {
             'xsrf_cookies': False,
-            'cookie_secret': 'fdRbVsgQ2GRtPxx066ShF6cX79ZUAV7KT1XXvNIzkr0IlLnJ'
+            'cookie_secret': 'fdRbVsgQ2GRtPxx066ShF6cX79ZUAV7KT1XXvNIzkr0IlLnJ',
+            'static_path': self._static_path,
         }
+
+    @property
+    def static_path(self):
+        # TODO: implement others property APIs
+        return self._static_path
 
 
 class DBSettings(FabricSettings):
