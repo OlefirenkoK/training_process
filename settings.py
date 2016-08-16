@@ -1,3 +1,6 @@
+import os
+
+
 class FabricDefaultSettings(dict):
 
     def __init__(self):
@@ -78,6 +81,25 @@ class DefaultDBSettings(FabricDefaultSettings):
         return settings
 
 
+class DefaultDevSettings(FabricDefaultSettings):
+
+    def __init__(self):
+        self._static_path = os.path.join(os.getcwd(), '/static/')
+        super().__init__()
+
+    def _default_settings(self):
+        return {
+            'xsrf_cookies': False,
+            'cookie_secret': 'fdRbVsgQ2GRtPxx066ShF6cX79ZUAV7KT1XXvNIzkr0IlLnJ',
+            'static_path': self._static_path,
+        }
+
+    @property
+    def static_path(self):
+        # TODO: implement others property APIs
+        return self._static_path
+
+
 class DBSettings(FabricSettings):
 
     POSTGRES_PATTERN = 'postgresql://{login}:{password}@{host}:{port}/{dbname}'
@@ -119,13 +141,22 @@ class RunSetting(FabricSettings):
     _id = 'run'
 
 
+class DevSettings(FabricSettings):
+
+    default_settings = DefaultDevSettings()
+    _id = 'dev'
+
+
 class SettingCollector(dict):
 
     __init = None
-    collector = [
+    _collector = (
         RunSetting,
         DBSettings,
-    ]
+    )
+    _none_group_settings = (
+        DevSettings,
+    )
 
     def __new__(cls, *args, **kwargs):
         if cls.__init is None:
@@ -139,10 +170,13 @@ class SettingCollector(dict):
 
     def __init__(self, **kwargs):
         settings = {}
-        for config in self.collector:
+        for config in self._collector:
             _id = config.get_id()
-            item_settings = kwargs.get(_id, None)
+            item_settings = kwargs.get(config.get_id(), None)
             settings[_id] = config(item_settings)
+        for config in self._none_group_settings:
+            item_settings = kwargs.get(config.get_id())
+            settings.update(**config(item_settings))
         super().__init__(settings)
 
     def get_settings(self, _id):

@@ -17,7 +17,8 @@ class TrainingProcessApplication(tornado.web.Application):
     def __init__(self):
         self._settings = get_or_create_project_settings()
         db_settings = self.config.get_settings('db')
-        self.db = get_db_session(db_settings)
+        Session = get_db_session(db_settings)
+        self.db = Session()
         tornado.web.Application.__init__(self, url_patterns, **self._settings)
 
     @property
